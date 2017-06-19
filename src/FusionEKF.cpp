@@ -34,6 +34,7 @@ FusionEKF::FusionEKF() {
   /**
   TODO:
     * Finish initializing the FusionEKF.
+    * Set the process and measurement noises
   */
   ekf_.F_ = MatrixXd(4, 4);
   ekf_.F_ << 1, 0, 1, 0,
@@ -121,7 +122,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
      * Update the state transition matrix F according to the new elapsed time.
       - Time is measured in seconds.
      * Update the process noise covariance matrix.
-     * Use sigma_ax = 9 and sigma_ay = 9 for your Q matrix.
+     * Use noise_ax = 9 and noise_ay = 9 for your Q matrix.
    */
 
   ekf_.F_(0, 2) = dt;
