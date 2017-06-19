@@ -49,11 +49,6 @@ FusionEKF::FusionEKF() {
   R_laser_ << 0.0225, 0,
               0, 0.0225;
 
-  // No idea if this is valid
-  R_radar_ << 0.0225, 0, 0,
-              0, 0.0225, 0,
-              0, 0, 0.0225;
-
   ekf_.Q_ = MatrixXd(4, 4);
 
   //set the acceleration noise components
@@ -111,7 +106,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   }
 
   float dt = (measurement_pack.timestamp_ - previous_timestamp_) / 1000000.0;	//dt - expressed in seconds
-  cout << dt << endl;
+  //cout << dt << endl;
   previous_timestamp_ = measurement_pack.timestamp_;
 
   /*****************************************************************************
@@ -138,7 +133,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
               dt_3/2*noise_ax, 0, dt_2*noise_ax, 0,
               0, dt_3/2*noise_ay, 0, dt_2*noise_ay;
 
-  cout << "Performing prediction step" << endl;
+  //cout << "Performing prediction step" << endl;
   ekf_.Predict();
 
   /*****************************************************************************
@@ -153,20 +148,20 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
     // Radar updates
-    cout << "Processing Radar measurement" << endl;
+    //cout << "Processing Radar measurement" << endl;
     this->Hj_ = this->tools.CalculateJacobian(ekf_.x_);
     ekf_.H_ = this->Hj_;
     ekf_.R_ = R_radar_;
     ekf_.UpdateEKF(measurement_pack.raw_measurements_);
   } else {
     // Laser updates
-    cout << "Processing Laser measurement" << endl;
+    //cout << "Processing Laser measurement" << endl;
     ekf_.H_ = H_laser_;
     ekf_.R_ = R_laser_;
     ekf_.Update(measurement_pack.raw_measurements_);
   }
 
   // print the output
-  cout << "x_ = " << ekf_.x_ << endl;
-  cout << "P_ = " << ekf_.P_ << endl;
+  //cout << "x_ = " << ekf_.x_ << endl;
+  //cout << "P_ = " << ekf_.P_ << endl;
 }
