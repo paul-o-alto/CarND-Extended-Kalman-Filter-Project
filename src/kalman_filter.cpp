@@ -67,7 +67,29 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   /* Same but use jacobian of F and H */
 
   //cout << "y = z - Hx" << endl;
-  VectorXd y = z - this->H_ * this->x_;
+  //VectorXd y = z - this->H_ * this->x_;
+  VectorXd hx(3);
+  float px = this->x_[0]; float vx = this->x_[2];
+  float py = this->x_[1]; float vy = this->x_[3];
+  float px2 = px*px;
+  float py2 = py*py;
+
+  
+  hx << sqrt(px2+py2), atan2(py, px), (px*vx + py*vy)/sqrt(px2+py2);
+
+  VectorXd y = z - hx; // Converted outside
+
+  float phi = y[1];
+  while (abs(phi) > 3.14) {
+      if (phi > 0) {
+          phi -= 2*3.14;
+      }
+      else {
+          phi += 2*3.14;
+      }
+  }
+  y[1] = phi;
+
   MatrixXd Ht = this->H_.transpose();
   //cout << "S = H*P*H_t + R" << endl;
   MatrixXd S = this->H_ * this->P_ * Ht + this->R_;

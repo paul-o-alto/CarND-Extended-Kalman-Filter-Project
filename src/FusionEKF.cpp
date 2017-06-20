@@ -22,14 +22,16 @@ FusionEKF::FusionEKF() {
   H_laser_ = MatrixXd(2, 4);
   Hj_ = MatrixXd(3, 4);
 
+  //DON'T CHANGE
   //measurement covariance matrix - laser
   R_laser_ << 0.0225, 0,
-        0, 0.0225;
+              0, 0.0225;
 
+  //DON'T CHANGE
   //measurement covariance matrix - radar
   R_radar_ << 0.09, 0, 0,
-        0, 0.0009, 0,
-        0, 0, 0.09;
+              0, 0.0009, 0,
+              0, 0, 0.09;
 
   /**
   TODO:
@@ -44,10 +46,6 @@ FusionEKF::FusionEKF() {
 
   H_laser_ << 1, 0, 0, 0,
               0, 1, 0, 0;
-
-  //measurement covariance
-  R_laser_ << 0.0225, 0,
-              0, 0.0225;
 
   ekf_.Q_ = MatrixXd(4, 4);
 
@@ -87,12 +85,12 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     ekf_.x_ << 1, 1, 1, 1;
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-
+      
       VectorXd polar(3);
-      polar << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], measurement_pack.raw_measurements_[2]; 
-      this->Hj_ = this->tools.CalculateJacobian(ekf_.x_);
+      polar << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 
+               measurement_pack.raw_measurements_[2]; 
       cout << "Converting polar to cartesian and Initializing state" << endl;
-      ekf_.x_ = this->Hj_.transpose()*polar;
+      ekf_.x_ << polar[0]*cos(polar[1]), polar[0]*sin(polar[1]), 0, 0;
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       cout << "Initializing state." << endl;
@@ -149,6 +147,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
     // Radar updates
     //cout << "Processing Radar measurement" << endl;
+    
     this->Hj_ = this->tools.CalculateJacobian(ekf_.x_);
     ekf_.H_ = this->Hj_;
     ekf_.R_ = R_radar_;
